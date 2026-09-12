@@ -18,9 +18,13 @@ def aes_encrypt(plaintext: str | bytes, key: bytes) -> Tuple[bytes, bytes]:
     nonce = os.urandom(12)
     return nonce, AESGCM(key).encrypt(nonce, plaintext, None)
 
+def aes_decrypt_bytes(nonce: bytes, ciphertext: bytes, key: bytes) -> bytes:
+    """AES-256-GCM decrypt and verify integrity tag. Returns raw bytes."""
+    return AESGCM(key).decrypt(nonce, ciphertext, None)
+
 def aes_decrypt(nonce: bytes, ciphertext: bytes, key: bytes) -> str:
     """AES-256-GCM decrypt and verify integrity tag."""
-    return AESGCM(key).decrypt(nonce, ciphertext, None).decode("utf-8")
+    return aes_decrypt_bytes(nonce, ciphertext, key).decode("utf-8")
 
 def aes_encrypt_b64(plaintext: str, key: bytes) -> str:
     """Encrypt and return base64(nonce || ciphertext) token."""
@@ -49,11 +53,14 @@ def rsa_encrypt(plaintext: str | bytes, public_key_pem: bytes) -> bytes:
     return serialization.load_pem_public_key(public_key_pem).encrypt(
         plaintext, padding.OAEP(padding.MGF1(hashes.SHA256()), hashes.SHA256(), None))
 
+def rsa_decrypt_bytes(ciphertext: bytes, private_key_pem: bytes) -> bytes:
+    """RSA-OAEP+SHA256 decrypt with private key. Returns raw bytes."""
+    return serialization.load_pem_private_key(private_key_pem, None).decrypt(
+        ciphertext, padding.OAEP(padding.MGF1(hashes.SHA256()), hashes.SHA256(), None))
+
 def rsa_decrypt(ciphertext: bytes, private_key_pem: bytes) -> str:
     """RSA-OAEP+SHA256 decrypt with private key."""
-    return serialization.load_pem_private_key(private_key_pem, None).decrypt(
-        ciphertext, padding.OAEP(padding.MGF1(hashes.SHA256()), hashes.SHA256(), None)
-    ).decode("utf-8")
+    return rsa_decrypt_bytes(ciphertext, private_key_pem).decode("utf-8")
 
 def sha256_hash(data: str | bytes) -> str:
     """SHA-256 hex digest."""
