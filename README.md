@@ -7,7 +7,7 @@
 ![Coverage](https://img.shields.io/badge/coverage-77%25-brightgreen)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-> Cryptographic utilities in Python: AES-256-GCM authenticated encryption, RSA-2048 key pairs, SHA-256/HMAC-SHA256 hashing, file-level encryption, and envelope encryption (KMS pattern). No external runtime dependencies beyond `cryptography`.
+> Cryptographic utilities in Python: AES-256-GCM authenticated encryption, RSA-2048 key pairs, SHA-256/HMAC-SHA256 hashing, and file-level encryption. No external runtime dependencies beyond `cryptography`.
 
 ## Architecture
 ```
@@ -18,9 +18,9 @@
 │  │ (symmetric)│  │(asymmetric) │  │  HMAC-SHA   │  │
 │  └────────────┘  └─────────────┘  └─────────────┘  │
 └─────────────────────────────────────────────────────┘
-         ↑                  ↑
-  file_encryptor.py   envelope_encrypt.py
-  (file-level AES)    (RSA wraps AES key — KMS pattern)
+         ↑
+  file_encryptor.py
+  (file-level AES)
 ```
 
 ## Features
@@ -32,7 +32,6 @@
 | Hashing | SHA-256 | Checksums, fingerprints |
 | Message authentication | HMAC-SHA256 | API request signing |
 | File encryption | AES-256-GCM | Files on disk |
-| Envelope encryption | RSA wraps AES key | Cloud KMS pattern |
 
 ## Quick Start
 ```bash
@@ -58,18 +57,10 @@ ct        = rsa_encrypt("secret", pub)
 plain     = rsa_decrypt(ct, priv)
 ```
 
-### Envelope Encryption (cloud KMS pattern)
-```python
-from src.envelope_encrypt import envelope_encrypt, envelope_decrypt
-
-enc_key, nonce, ct = envelope_encrypt("large payload", pub)
-plain = envelope_decrypt(enc_key, nonce, ct, priv)
-```
-
 ## Security Notes
 - **Nonces**: AES-GCM uses 96-bit random nonces — a fresh one per call. Never reuse a nonce with the same key.
 - **Key storage**: Use environment variables, HashiCorp Vault, or a cloud KMS — never hardcode keys.
-- **RSA payload limit**: RSA-2048/OAEP encrypts at most ~190 bytes. Use envelope encryption for larger data.
+- **RSA payload limit**: RSA-2048/OAEP encrypts at most ~190 bytes. For larger data, encrypt it with AES and encrypt only the AES key with RSA.
 - **Tamper detection**: AES-GCM's 128-bit auth tag raises `InvalidTag` on any ciphertext modification.
 
 ## Testing
