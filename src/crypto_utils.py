@@ -18,9 +18,13 @@ def aes_encrypt(plaintext: str | bytes, key: bytes) -> Tuple[bytes, bytes]:
     nonce = os.urandom(12)
     return nonce, AESGCM(key).encrypt(nonce, plaintext, None)
 
+def aes_decrypt_bytes(nonce: bytes, ciphertext: bytes, key: bytes) -> bytes:
+    """AES-256-GCM decrypt and verify integrity tag; returns raw bytes."""
+    return AESGCM(key).decrypt(nonce, ciphertext, None)
+
 def aes_decrypt(nonce: bytes, ciphertext: bytes, key: bytes) -> str:
-    """AES-256-GCM decrypt and verify integrity tag."""
-    return AESGCM(key).decrypt(nonce, ciphertext, None).decode("utf-8")
+    """AES-256-GCM decrypt and verify integrity tag; returns UTF-8 text."""
+    return aes_decrypt_bytes(nonce, ciphertext, key).decode("utf-8")
 
 def aes_encrypt_b64(plaintext: str, key: bytes) -> str:
     """Encrypt and return base64(nonce || ciphertext) token."""

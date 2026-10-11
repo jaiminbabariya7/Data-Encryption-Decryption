@@ -3,8 +3,8 @@
 ![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python)
 ![AES-256-GCM](https://img.shields.io/badge/AES--256--GCM-Authenticated_Encryption-green)
 ![RSA-2048](https://img.shields.io/badge/RSA--2048-Asymmetric-blue)
-![Tests](https://img.shields.io/badge/tests-15%20passing-brightgreen)
-![Coverage](https://img.shields.io/badge/coverage-77%25-brightgreen)
+![Tests](https://img.shields.io/badge/tests-16%20passing-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 > Cryptographic utilities in Python: AES-256-GCM authenticated encryption, RSA-2048 key pairs, SHA-256/HMAC-SHA256 hashing, and file-level encryption. No external runtime dependencies beyond `cryptography`.
@@ -65,7 +65,7 @@ plain     = rsa_decrypt(ct, priv)
 
 ## Testing
 ```bash
-make test    # 15 unit tests with coverage report
+make test    # 16 unit tests with coverage report
 make lint    # flake8 + black check
 ```
 

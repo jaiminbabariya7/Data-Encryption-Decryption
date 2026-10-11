@@ -48,4 +48,18 @@ class TestHashing(unittest.TestCase):
     def test_verify_valid(self):   self.assertTrue(verify_hmac("d","k", hmac_sha256("d","k")))
     def test_verify_invalid(self): self.assertFalse(verify_hmac("d","k", "deadbeef"*8))
 
+class TestFileEncryption(unittest.TestCase):
+    def test_binary_file_roundtrip(self):
+        import tempfile
+        from pathlib import Path
+        from src.file_encryptor import encrypt_file, decrypt_file
+        data = bytes(range(256)) * 4                      # not valid UTF-8
+        with tempfile.TemporaryDirectory() as d:
+            src, enc, out = Path(d, "in.bin"), Path(d, "in.bin.enc"), Path(d, "out.bin")
+            src.write_bytes(data)
+            key = encrypt_file(src, enc)
+            self.assertNotEqual(enc.read_bytes(), data)
+            decrypt_file(enc, out, key)
+            self.assertEqual(out.read_bytes(), data)
+
 if __name__ == "__main__": unittest.main()
